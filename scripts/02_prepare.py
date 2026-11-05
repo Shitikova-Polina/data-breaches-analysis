@@ -178,6 +178,7 @@ breaches = pd.DataFrame({
     "is_verified": df["IsVerified"].astype(int).to_numpy(),
     "is_sensitive": df["IsSensitive"].astype(int).to_numpy(),
     "is_spam_list": df["IsSpamList"].astype(int).to_numpy(),
+    "description": df["description_text"].to_numpy(),  # текст описания без HTML
 })
 data_classes = pd.DataFrame({"data_class": sorted(pairs["data_class"].unique())})
 data_classes.insert(0, "class_id", range(1, len(data_classes) + 1))

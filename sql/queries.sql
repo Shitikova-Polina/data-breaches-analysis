@@ -151,3 +151,30 @@ SELECT CAST(strftime('%Y', breach_date) AS INTEGER)                  AS year,
 FROM breaches
 GROUP BY year
 ORDER BY year;
+
+
+-- name: 10_shinyhunters
+-- Почему в последние годы падает доля утечек с паролями? Проверяем одну
+-- гипотезу: в 2026 году много утечек от группы вымогателей ShinyHunters
+-- («заплати, или опубликуем»), которые крадут базы клиентов, а не пароли.
+-- LIKE '%ShinyHunters%' ищет это слово в любом месте описания.
+WITH tagged AS (
+    SELECT b.breach_id,
+           CAST(strftime('%Y', b.breach_date) AS INTEGER)            AS year,
+           CASE WHEN b.description LIKE '%ShinyHunters%' THEN 1 ELSE 0 END AS is_shinyhunters,
+           CASE WHEN EXISTS (
+               SELECT 1
+               FROM breach_data_classes AS bdc
+               JOIN data_classes AS dc ON dc.class_id = bdc.class_id
+               WHERE bdc.breach_id = b.breach_id AND dc.data_class = 'Passwords'
+           ) THEN 1 ELSE 0 END                                       AS has_passwords
+    FROM breaches AS b
+)
+SELECT year,
+       is_shinyhunters,
+       COUNT(*)                                     AS breaches,
+       ROUND(100.0 * SUM(has_passwords) / COUNT(*), 1) AS pct_with_passwords
+FROM tagged
+WHERE year >= 2024
+GROUP BY year, is_shinyhunters
+ORDER BY year, is_shinyhunters;
