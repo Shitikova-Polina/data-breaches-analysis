@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+.DS_Store
+# База пересоздаётся скриптом из data/raw/breaches.json
+data/breaches.db
