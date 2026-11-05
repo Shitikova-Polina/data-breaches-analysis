@@ -61,6 +61,9 @@ df["description_text"] = df["Description"].apply(lambda s: re.sub(r"<[^>]+>", ""
 # но «app» не найдёт «happened». Знак $ в конце значит «слово целиком»
 # («car$» найдёт «car», но не «card»).
 INDUSTRY_RULES = [
+    ("Сборники и спам-базы",   ["combolist", "combo list", "credential stuffing", "stealer log",
+                                "spambot", "spam list", "collection #", "data enrichment",
+                                "data aggregator", "data broker"]),
     # «dating» отдельно не берём: оно ловит фразу «dating back to» («начиная с»)
     ("Знакомства и 18+",       ["dating app", "dating site", "dating website", "dating service",
                                 "dating platform", "online dating", "adult", "porn", "sex$", "escort", "hookup", "relationship",
@@ -81,7 +84,7 @@ INDUSTRY_RULES = [
     ("Путешествия и транспорт", ["travel", "hotel", "airline", "flight", "booking", "tourism", "car$",
                                  "cars$", "taxi", "transport", "rental", "vehicle", "automotive"]),
     ("СМИ и развлечения",      ["news", "magazine", "music", "video", "stream", "movie", "film", "anime",
-                                "media", "radio", "podcast", "book", "comic", "entertainment", "photo",
+                                "media", "radio", "podcast", "book$", "books$", "ebook", "comic", "entertainment", "photo",
                                 "publish", "torrent", "tv$"]),
     ("Форумы и соцсети",       ["forum", "community", "social", "message board", "chat", "fan site",
                                 "fansite", "blog"]),
@@ -104,8 +107,32 @@ def keyword_found(keyword, text):
     return re.search(pattern, text) is not None
 
 
+# Ручные исправления для 30 крупнейших утечек: в их описаниях часто нет слов
+# про сам сервис («In 2016, LinkedIn had 164 million email addresses...»),
+# а именно они дают основную часть затронутых аккаунтов. Я прочитала
+# описания этих утечек и отнесла их к отрасли сама. Ключ — поле Name из HIBP.
+MANUAL_OVERRIDES = {
+    "ExploitIn": "Сборники и спам-базы",       # «combo list» из многих утечек
+    "Cit0day": "Сборники и спам-базы",         # сборник из 23 000 взломанных сайтов
+    "NotSOCRadar": "Сборники и спам-базы",     # собранный список адресов
+    "NationalPublicData": "Сборники и спам-базы",  # брокер данных (проверка биографий)
+    "Exactis": "Сборники и спам-базы",         # маркетинговый брокер данных
+    "Facebook": "Форумы и соцсети",
+    "MySpace": "Форумы и соцсети",
+    "Twitter200M": "Форумы и соцсети",
+    "LinkedIn": "Форумы и соцсети",
+    "LinkedInScrape": "Форумы и соцсети",
+    "NetEase": "IT-сервисы и телеком",         # почтовый сервис и портал 163.com
+    "Adobe": "IT-сервисы и телеком",
+    "Apollo": "IT-сервисы и телеком",          # облачный сервис для продаж
+    "Wattpad": "СМИ и развлечения",            # платформа для чтения историй
+}
+
+
 def classify(row):
     """Возвращает отрасль по первому совпавшему правилу или «Другое»."""
+    if row["Name"] in MANUAL_OVERRIDES:
+        return MANUAL_OVERRIDES[row["Name"]]
     # Спам-базы, сборники из вредоносных программ и логи стилеров HIBP помечает
     # флагами: это не взлом конкретного сервиса, отрасли у них нет
     if row["IsSpamList"] or row["IsMalware"] or row["IsStealerLog"]:

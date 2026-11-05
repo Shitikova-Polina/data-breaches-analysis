@@ -1,0 +1,16 @@
+data_class,breaches,pct_of_breaches
+Email addresses,1039,99.3
+Passwords,673,64.3
+Names,565,54.0
+Usernames,485,46.4
+IP addresses,387,37.0
+Phone numbers,383,36.6
+Physical addresses,310,29.6
+Dates of birth,287,27.4
+Genders,198,18.9
+Geographic locations,150,14.3
+Purchases,86,8.2
+Website activity,77,7.4
+Job titles,56,5.4
+Social media profiles,52,5.0
+Employers,48,4.6

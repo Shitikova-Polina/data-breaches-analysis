@@ -1,0 +1,16 @@
+class_a,class_b,breaches_together
+Email addresses,Passwords,669
+Email addresses,Names,562
+Email addresses,Usernames,482
+Passwords,Usernames,418
+Email addresses,IP addresses,385
+Email addresses,Phone numbers,379
+Names,Phone numbers,359
+IP addresses,Passwords,308
+Email addresses,Physical addresses,307
+Names,Physical addresses,299
+Dates of birth,Email addresses,285
+Phone numbers,Physical addresses,267
+Names,Passwords,266
+IP addresses,Usernames,260
+Dates of birth,Names,216
