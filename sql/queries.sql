@@ -142,7 +142,7 @@ ORDER BY gov_ids + partial_cards + credit_cards + private_messages DESC;
 -- name: 09_disclosure_lag
 -- Сколько времени проходит от утечки до её появления в HIBP.
 -- julianday переводит дату в число дней, разница — задержка в днях.
--- Это важно: утечки последних лет ещё не все стали известны.
+-- Утечки последних лет известны ещё не все.
 SELECT CAST(strftime('%Y', breach_date) AS INTEGER)                  AS year,
        COUNT(*)                                                      AS breaches,
        ROUND(AVG(julianday(added_date) - julianday(breach_date)))    AS avg_lag_days,
